@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
     static class GroceryItem {
         String type;
         String name;
@@ -16,18 +15,15 @@ public class Main {
             this.stock = stock;
         }
 
-        public boolean reduceStock(int quantity) {
+        public void reduceStock(int quantity) {
             if (quantity <= stock) {
-                stock -= quantity;
-                return true;
+                stock = stock - quantity;
             }
-            return false;
         }
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
+        // Initialize grocery items
         ArrayList<GroceryItem> items = new ArrayList<>();
         items.add(new GroceryItem("Fruit", "Apple", 25.0, 100));
         items.add(new GroceryItem("Vegetable", "Carrot", 20.0, 150));
@@ -35,50 +31,35 @@ public class Main {
         items.add(new GroceryItem("Dairy", "Milk", 55.0, 60));
         items.add(new GroceryItem("Snack", "Chips", 60.0, 50));
 
+        Scanner scanner = new Scanner(System.in);
+        double total = 0;
+
         System.out.println("Welcome to the Grocery Store!");
 
         while (true) {
-
             System.out.println("\nItems for sale:");
             for (int i = 0; i < items.size(); i++) {
                 GroceryItem item = items.get(i);
-                System.out.println((i + 1) + ". " + item.name + " (" + item.type + ") - Price: $" 
-                    + String.format("%.2f", item.price) + " - Stock: " + item.stock);
+                System.out.println((i + 1) + ". " + item.name + " (" + item.type + ") - Price: $" + String.format("%.2f", item.price) + " - Stock: " + item.stock);
             }
-            System.out.println("0. Exit");
+            System.out.println("0. Checkout");
 
-            System.out.print("Choose item number to buy (0 to exit): ");
-            int choice = -1;
-
-            if (scanner.hasNextInt()) {
-                choice = scanner.nextInt();
-            } else {
-                System.out.println("Invalid input! Please enter a number.");
-                scanner.next(); 
-                continue;
-            }
+            System.out.print("Choose item number to buy (0 to checkout): ");
+            int choice = scanner.nextInt();
 
             if (choice == 0) {
-                System.out.println("Thanks for visiting the store!");
                 break;
             }
 
             if (choice < 1 || choice > items.size()) {
-                System.out.println("Invalid choice. Please select a valid item number.");
+                System.out.println("Invalid choice, try again.");
                 continue;
             }
 
             GroceryItem selectedItem = items.get(choice - 1);
 
-            System.out.print("Enter quantity to buy: ");
-            int qty = -1;
-            if (scanner.hasNextInt()) {
-                qty = scanner.nextInt();
-            } else {
-                System.out.println("Invalid input! Please enter a number.");
-                scanner.next();
-                continue;
-            }
+            System.out.print("Enter quantity: ");
+            int qty = scanner.nextInt();
 
             if (qty <= 0) {
                 System.out.println("Quantity must be positive.");
@@ -86,16 +67,19 @@ public class Main {
             }
 
             if (qty > selectedItem.stock) {
-                System.out.println("Sorry, not enough stock. Available: " + selectedItem.stock);
+                System.out.println("Not enough stock. Available: " + selectedItem.stock);
                 continue;
             }
 
-            selectedItem.reduceStock(qty);
             double cost = selectedItem.price * qty;
-            System.out.println("You bought " + qty + " x " + selectedItem.name + " for $" + String.format("%.2f", cost));
-            System.out.println("Remaining stock of " + selectedItem.name + ": " + selectedItem.stock);
+            total = total + cost;
+            selectedItem.reduceStock(qty);
+
+            System.out.println("Added " + qty + " x " + selectedItem.name + " to your cart. Cost: $" + String.format("%.2f", cost));
+            System.out.println("Total so far: $" + String.format("%.2f", total));
         }
 
+        System.out.println("\nYour total to pay is: $" + String.format("%.2f", total));
         scanner.close();
     }
 }
